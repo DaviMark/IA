@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/15579/15579184.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #3a3a3a);
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .card {
+            background-color: #2c2c2c;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-header {
+            background-color: #1e1e1e;
+            border-bottom: none;
+            text-align: center;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #1a1a1a;
+            border: 1px solid #4a4a4a;
+        }
+
+        .input-group {
+            color: #ffffff;
+            margin-top: 10px;
+        }
+
+        .input-group input {
+            background-color: #4a4a4a;
+            color: #ffffff;
+            border: 1px solid #6c757d;
+            border-radius: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .input-group input:focus {
+            background-color: #6c757d;
+            border-color: #007bff;
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: right;
+        }
+
+        .chatbot-message {
+            background-color: #3e3e3e;
+            color: #ffffff;
+        }
+
+        .message:hover {
+            background-color: rgba(0, 123, 255, 0.8);
+        }
+
+        .message strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .suggestions {
+            background-color: #4a4a4a;
+            border-radius: 10px;
+            max-height: 150px;
+            max-width: 95%;
+            overflow-y: auto;
+            position: absolute;
+            bottom: 10%; /* Faz com que a lista apareça acima do input */
+            left: 20px; /* Alinha à esquerda do input */
+            right: 0; /* Para que a largura da sugestão seja igual ao input */
+            z-index: 1000;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #007bff;
+        }
+
+        /* Footer */
+
+
+footer {
+    background-color: #22222251;
+    color: #fff;
+    font-size: 14px;
+    bottom: 0;
+    position: fixed;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 999;
+}
+
+footer p {
+    margin: 10px 0;
+}
+
+footer i {
+    color: red;
+}
+
+footer a {
+    color: #3c97bf;
+    text-decoration: none;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h4>Chat</h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-robot" viewBox="0 0 16 16">
+                    <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+                    <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+                  </svg>
+            </div>
+            <div class="card-body">
+                <div class="chat-box" id="messages">
+                    <!-- Mensagens do chatbot e do usuário aparecerão aqui -->
+                </div>
+                <div id="suggestions" class="suggestions" style="display: none;"></div>
+                <div class="input-group">
+                    <input type="text" id="userInput" class="form-control" placeholder="Digite sua mensagem..." autocomplete="off">
+                    <div class="input-group-append">
+                        <button id="sendBtn" class="btn btn-primary" type="button"><i class="fas fa-paper-plane"></i> Enviar</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>
+            Desenvolvido por
+            <a target="_blank" href="https://davimarques.netlify.app/" style="text-decoration: none;">Davi Marques</a>.
+        </p>
+      </footer>
+
+    <script>
+        const sendBtn = document.getElementById('sendBtn');
+        const userInput = document.getElementById('userInput');
+        const messages = document.getElementById('messages');
+        const suggestions = document.getElementById('suggestions');
+
+        const exampleQuestions = [
+            "como vai",
+            "e ai",
+            "saudacoes",
+            "bom dia pra você",
+            "boa tarde pra você",
+            "boa noite pra você",
+            "olá amigo",
+            "como você está",
+            "oi pessoal",
+            "como foi seu dia",
+            "olá a todos",
+            "e aí, beleza",
+            "que tal",
+            "tudo tranquilo",
+            "olá, como vai",
+            "como anda",
+            "como tem passado",
+            "como está o clima",
+            "olá, tudo certo",
+            "bom dia, tudo bem",
+            "olá, feliz em te ver",
+            "olá, como posso ajudar",
+            "oi, que bom te ver",
+            "tudo em cima",
+            "só passando pra dizer oi",
+            "prazer em conhecer",
+            "oi, tudo em ordem",
+            "olá, como vai você",
+            "olá, tudo legal",
+            "oi, boas vibrações",
+            "como vão as coisas",
+            "bom dia, tudo certo por ai",
+            "oi, espero que esteja bem",
+            "olá, como foi seu dia",
+            "como estão as coisas",
+            "oi, estou aqui pra ajudar",
+            "como tem sido seu dia",
+            "bom dia, como está o seu dia",
+            "oi, como está a vida",
+            "olá, tudo tranquilo por aqui",
+            "tudo na paz",
+            "como você tem se sentido",
+            "oi, que alegria te ver",
+            "como vai sua semana",
+            "ola",
+            "tudo bem",
+            "oi",
+            "bom dia",
+            "boa tarde",
+            "boa noite",
+            "ate logo",
+            "sair",
+            "O que é a nuvem",
+            "Como funciona a criptomoeda",
+            "O que é um aplicativo móvel",
+            "O que é um site",
+            "O que é um vírus de computador",
+            "Como funciona o phishing",
+            "O que é um sistema de gerenciamento de banco de dados",
+            "O que é a inteligência artificial",
+            "Como funciona a realidade aumentada",
+            "O que é machine learning",
+            "O que é um algoritmo",
+            "O que é o big data",
+            "Como funciona a tecnologia 5G",
+            "O que é um firewall",
+            "O que é a computação em nuvem",
+            "Como funciona a automação industrial",
+            "O que é a internet das coisas",
+            "O que é um bot",
+            "Como funciona o reconhecimento facial",
+            "O que é um sistema operacional",
+            "O que é um servidor",
+            "Como funciona a criptografia",
+            "O que é um site responsivo",
+            "O que é um CMS",
+            "O que é um proxy",
+            "O que é uma rede virtual privada (VPN)",
+            "O que é a inteligência de negócio",
+            "Como funciona o armazenamento em nuvem",
+            "O que é o machine vision",
+            "O que é a blockchain",
+            "Como funciona a impressão 3D",
+            "O que é um hack",
+            "Como funciona o streaming",
+            "O que é a cibersegurança",
+            "O que é o desenvolvimento de software",
+            "Como funciona a computação quântica",
+            "O que é um dispositivo wearable",
+            "O que é o design responsivo",
+            "Como funciona a autenticação de dois fatores",
+            "O que é a realidade virtual",
+            "Como funciona a aprendizagem de máquina",
+            "O que é um script",
+            "O que é um banco de dados relacional",
+            "O que é a interface de programação de aplicativos (API)",
+            "Como funciona a compressão de dados",
+            "O que é a virtualização",
+            "O que é um sistema de controle de versão",
+            "O que é o machine translation",
+            "Como funciona o processamento de linguagem natural",
+            "O que é a Pitransportes",
+            "Como a Pitransportes melhora a eficiência no transporte",
+            "Quais são os principais benefícios da Pitransportes",
+            "A Pitransportes pode ser integrada a outros sistemas",
+            "Como funciona o monitoramento em tempo real",
+            "Quais tipos de transporte a Pitransportes abrange",
+            "A Pitransportes é adequada para pequenas empresas",
+            "Como a Pitransportes ajuda na redução de custos",
+            "Qual a importância do rastreamento de cargas",
+            "Como funciona a planificação de rotas",
+            "A Pitransportes oferece suporte ao cliente",
+            "Quais são os requisitos para usar a Pitransportes",
+            "É possível acessar a Pitransportes de dispositivos móveis",
+            "Quais funcionalidades a Pitransportes oferece",
+            "Como a Pitransportes melhora a comunicação entre transportadoras",
+            "A Pitransportes permite agendar entregas",
+            "Como a Pitransportes garante a segurança das cargas",
+            "Quais indústrias podem se beneficiar da Pitransportes",
+            "Como a Pitransportes auxilia na redução de emissão de carbono",
+            "Quais dados são coletados pelo sistema",
+            "É possível personalizar o sistema Pitransportes",
+            "A Pitransportes oferece relatórios de desempenho",
+            "Quais são as ferramentas de análise disponíveis",
+            "Como a Pitransportes facilita a gestão de frota",
+            "A Pitransportes possui suporte técnico",
+            "Como a Pitransportes lida com emergências",
+            "Quais são as opções de pagamento",
+            "Como a Pitransportes se destaca da concorrência",
+            "A Pitransportes permite a gestão de várias filiais",
+            "Como funciona o cadastro de usuários",
+            "Quais são os protocolos de segurança da Pitransportes",
+            "Como a Pitransportes garante a conformidade regulatória",
+            "Quais são os custos de implementação do sistema",
+            "A Pitransportes oferece treinamento para novos usuários",
+            "Como a Pitransportes facilita o relacionamento com clientes",
+            "A Pitransportes pode ser utilizada em outros países",
+            "Como a Pitransportes auxilia no planejamento de cargas",
+            "A Pitransportes pode ser acessada offline",
+            "Como a Pitransportes facilita o controle de inventário",
+            "Quais são as opções de suporte ao cliente",
+            "A Pitransportes é adequada para grandes empresas",
+            "Como a Pitransportes auxilia na gestão de custos",
+            "Quais são os feedbacks dos usuários sobre a Pitransportes",
+            "A Pitransportes permite agendamento de coletas",
+            "Como a Pitransportes melhora a transparência nas operações",
+            "Quais são as possibilidades de personalização do sistema",
+            "Como a tecnologia melhora a gestão da cadeia de suprimentos",
+            "Quais são os principais desafios da logística",
+            "Como o big data pode ser utilizado na logística",
+            "Qual a importância da logística reversa",
+            "Como a automação de armazéns aumenta a produtividade",
+            "Quais são os benefícios do uso de drones na entrega",
+            "Como a sustentabilidade impacta as operações logísticas",
+            "Quais são as tendências atuais na logística",
+            "Como a tecnologia RFID auxilia no controle de inventário",
+            "Quais são os principais indicadores de desempenho logístico",
+            "Como a logística impacta a experiência do cliente",
+            "Quais são as vantagens do uso de softwares de gerenciamento logístico",
+            "Como a comunicação eficaz melhora a logística",
+            "Quais são as funções do operador logístico",
+            "Como a previsão de demanda influencia a logística",
+            "Quais são os custos envolvidos na logística",
+            "Como a colaboração entre empresas melhora a logística",
+            "Quais são os riscos na cadeia de suprimentos",
+            "Como a análise de dados pode reduzir custos logísticos",
+            "Quais são os benefícios do cross-docking na logística",
+            "Como o planejamento logístico pode melhorar a competitividade",
+            "Quais são as melhores práticas de embalagem na logística",
+            "Como as tecnologias de blockchain podem ser aplicadas na logística",
+            "Quais são os impactos da globalização na logística",
+            "Como a logística de última milha pode ser otimizada",
+            "Quais são as vantagens de um centro de distribuição",
+            "Como a gestão de riscos pode ser aplicada na logística",
+            "Quais são as tecnologias emergentes na logística",
+            "Como a cultura organizacional afeta a logística",
+            "Quais são os benefícios do transporte intermodal",
+            "Como o uso de aplicativos de transporte pode beneficiar a logística",
+            "Quais são os requisitos legais para a operação logística",
+            "Como a manutenção preventiva pode reduzir custos logísticos",
+            "Quais são os principais desafios do transporte internacional",
+            "Como a experiência do consumidor influencia as operações logísticas",
+            "Quais são os principais tipos de transporte utilizados na logística",
+            "Como o gerenciamento de estoque impacta a logística",
+            "Quais são as vantagens do uso de sistemas de gerenciamento de armazéns (WMS)",
+            "Como a automação pode reduzir o erro humano na logística",
+            "Quais são os desafios do transporte de produtos perecíveis",
+            "Como a flexibilidade na logística pode ser uma vantagem competitiva",
+            "Quais são as melhores práticas para gerenciar fornecedores na logística",
+            "Como a logística afeta a cadeia de valor da empresa",
+            "Quais são as implicações da digitalização na logística",
+            "Como a logística contribui para a sustentabilidade empresarial",
+            "Quais são os principais componentes de um plano logístico eficaz",
+            "Como a análise preditiva pode melhorar a logística",
+            "Quais são os impactos das mudanças climáticas na logística",
+            "Como as parcerias logísticas podem aumentar a eficiência",
+        ];
+
+        userInput.addEventListener('input', () => {
+            const inputText = userInput.value.toLowerCase();
+            suggestions.innerHTML = ''; // Limpa sugestões anteriores
+
+            if (inputText) {
+                const filteredQuestions = exampleQuestions.filter(question => 
+                    question.toLowerCase().includes(inputText)
+                );
+
+                filteredQuestions.forEach(question => {
+                    const suggestionItem = document.createElement('div');
+                    suggestionItem.classList.add('suggestion-item');
+                    suggestionItem.textContent = question;
+                    suggestionItem.onclick = () => {
+                        userInput.value = question; // Preenche o input com a sugestão
+                        suggestions.innerHTML = ''; // Limpa as sugestões
+                        suggestions.style.display = 'none'; // Oculta as sugestões
+                    };
+                    suggestions.appendChild(suggestionItem);
+                });
+
+                // Exibe as sugestões se houver alguma
+                suggestions.style.display = filteredQuestions.length > 0 ? 'block' : 'none';
+            } else {
+                suggestions.style.display = 'none'; // Oculta se o campo estiver vazio
+            }
+        });
+
+        sendBtn.addEventListener('click', () => {
+            const inputText = userInput.value.trim();
+            if (inputText === '') return;
+
+            // Adiciona a mensagem do usuário com ícone
+            messages.innerHTML += `<div class="message user-message"><strong><i class="fas fa-user"></i> Você:</strong> ${inputText}</div>`;
+
+            // Envia a mensagem para o backend
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: inputText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Adiciona a resposta do chatbot com ícone
+                messages.innerHTML += `<div class="message chatbot-message"><strong><i class="fas fa-robot"></i> Chatbot:</strong> ${data.response}</div>`;
+                messages.scrollTop = messages.scrollHeight; // Rola para o final
+            });
+
+            userInput.value = ''; // Limpa o campo de entrada
+            suggestions.style.display = 'none'; // Oculta sugestões ao enviar
+        });
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click(); // Simula o clique do botão ao pressionar Enter
+            }
+        });
+    </script>
+</body>
+</html>
