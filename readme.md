@@ -7,8 +7,7 @@ Este projeto é um chatbot simples implementado com Flask, que responde a pergun
 ## Funcionalidades
 
 - Respostas automatizadas a perguntas frequentes.
-- Saída amigável quando o usuário deseja encerrar o chat.
-- Interface web simples, acessível através de um navegador.
+- Interface web interativa e impressionante através de um navegador.
 
 ## Requisitos
 
